@@ -1,7 +1,7 @@
 HTML5
 css
 JavaScript
-FileReader API
+FileReader
 Chart.js
 Python
 NumPy
