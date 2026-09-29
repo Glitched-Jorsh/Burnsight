@@ -1,0 +1,12 @@
+HTML5
+css
+JavaScript
+FileReader API
+Chart.js
+Python
+NumPy
+Pandas
+Scikit-learn
+SHAP
+FastAPI
+Netlify
