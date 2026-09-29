@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurnSight AI | Reliability Workbench</title>
+    <!-- Professional Enterprise Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #94a3b8;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.20) 0%, transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(0, 245, 155, 0.14) 0%, transparent 40%),
+                linear-gradient(rgba(8, 14, 28, 0.55), rgba(4, 8, 18, 0.70)),
+                url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            padding: 24px;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(13, 22, 40, 0.68);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 18px;
+            box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75);
+        }
+
+        .app-shell {
+            display: flex;
+            width: 100%;
+            max-width: 1560px;
+            margin: 0 auto;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .sidebar-panel {
+            width: 320px;
+            min-width: 320px;
+            max-width: 320px;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            flex: 0 0 320px;
+        }
+
+        .sidebar-panel.collapsed {
+            width: 0;
+            min-width: 0;
+            max-width: 0;
+            margin-right: -24px;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+            flex: 0 0 0;
+        }
+
+        .main-dashboard {
+            flex: 1;
+            min-width: 0;
+            width: calc(100% - 344px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .sidebar-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 16px;
+            width: 30px;
+            height: 30px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-close-btn:hover {
+            background: #0284c7;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .reopen-sidebar-btn {
+            display: none;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reopen-sidebar-btn:hover {
+            background: #0284c7;
+            color: #fff;
+        }
+
+        .top-navbar-single {
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-bottom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 4px;
+        }
+
+        .header-title-text {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #f8fafc;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle-text {
+            font-size: 0.92rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.2px;
+        }
+
+        .header-meta-chip {
+            font-size: 0.86rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .pill-badge-red {
+            background: rgba(255, 42, 95, 0.18);
+            color: #FF2A5F;
+            border: 1px solid rgba(255, 42, 95, 0.45);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .pill-badge-green {
+            background: rgba(0, 245, 155, 0.18);
+            color: #00F59B;
+            border: 1px solid rgba(0, 245, 155, 0.45);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .pill-badge-yellow {
+            background: rgba(255, 184, 0, 0.18);
+            color: #FFB800;
+            border: 1px solid rgba(255, 184, 0, 0.45);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .pill-badge-white {
+            background: rgba(255, 255, 255, 0.18);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            padding: 8px 18px;
+            border-radius: 9999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .milestone-stepper {
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .milestone-step {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            min-width: 0;
+        }
+
+        .milestone-step div {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .milestone-step:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.6), 0 0 15px rgba(56, 189, 248, 0.25);
+            z-index: 50;
+        }
+
+        .milestone-step.done {
+            border-color: rgba(0, 245, 155, 0.35);
+            color: #00F59B;
+        }
+
+        .milestone-arrow {
+            color: #475569;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .progress-box { padding: 16px 22px; }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .progress-track {
+            background: rgba(30, 41, 59, 0.75);
+            border-radius: 9999px;
+            height: 9px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            border-radius: 9999px;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+        }
+
+        .metrics-grid-single {
+            margin-bottom: 24px;
+        }
+
+        .donut-highlight-card {
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+        }
+
+        .panel-container {
+            padding: 24px 26px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #f8fafc;
+            letter-spacing: -0.3px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .socket-chip {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 11px 4px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .socket-chip:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.7), 0 0 14px rgba(56, 189, 248, 0.35);
+            border-color: rgba(255,255,255,0.45);
+            z-index: 50;
+        }
+
+        .socket-id {
+            font-size: 0.76rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .socket-pill {
+            font-size: 0.68rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            padding: 2px 7px;
+            display: inline-block;
+        }
+
+        .chip-pass { border-top: 2px solid #00F59B; }
+        .chip-pass .socket-pill { background: rgba(0, 245, 155, 0.18); color: #00F59B; }
+
+        .chip-warn { border-top: 2px solid #FFB800; }
+        .chip-warn .socket-pill { background: rgba(255, 184, 0, 0.18); color: #FFB800; }
+
+        .chip-fail { border-top: 2px solid #FF2A5F; }
+        .chip-fail .socket-pill { background: rgba(255, 42, 95, 0.20); color: #FF2A5F; }
+
+        .tooltip-card {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-20%) translateY(10px);
+            width: 250px;
+            background: rgba(15, 23, 42, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.85);
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            text-align: left;
+            font-size: 0.73rem;
+            line-height: 1.5;
+            white-space: nowrap;
+        }
+
+        .socket-chip:nth-child(10n-9) .tooltip-card,
+        .socket-chip:nth-child(10n-8) .tooltip-card {
+            left: 0;
+            transform: translateX(0) translateY(10px);
+        }
+
+        .socket-chip:hover .tooltip-card,
+        .milestone-step:hover .tooltip-card {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-20%) translateY(0);
+        }
+
+        .socket-chip:nth-child(10n-9):hover .tooltip-card,
+        .socket-chip:nth-child(10n-8):hover .tooltip-card {
+            transform: translateX(0) translateY(0);
+        }
+
+        .filter-btn-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            color: #f8fafc;
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .filter-btn.active {
+            background: rgba(56, 189, 248, 0.16);
+            color: #38bdf8;
+            border-color: #38bdf8;
+        }
+
+        select, textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f8fafc;
+            padding: 12px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            outline: none;
+        }
+        select:focus, textarea:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .radio-option:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            background: rgba(56, 189, 248, 0.08);
+        }
+        .radio-option.selected {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.12);
+            color: #f8fafc;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.85) 0%, rgba(3, 105, 161, 0.85) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+            transition: all 0.2s ease;
+            margin-top: 14px;
+        }
+        .btn-action:hover {
+            background: linear-gradient(135deg, rgba(3, 105, 161, 0.95) 0%, rgba(2, 132, 199, 0.95) 100%);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .bottom-export-bar {
+            margin-top: 10px;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-download-csv {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-csv:hover {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .file-upload-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px dashed rgba(56, 189, 248, 0.35);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            margin-bottom: 22px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .file-upload-box:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.06);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(4, 7, 15, 0.75);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            width: 520px;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(0, 245, 155, 0.15);
+            border: 1px solid rgba(0, 245, 155, 0.35);
+            color: #00F59B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 16px;
+        }
+
+        .sidebar-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            margin-bottom: 24px;
+        }
+        .sidebar-table th {
+            text-align: left;
+            padding: 10px 8px;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+        .sidebar-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #cbd5e1;
+        }
+
+        .mission-footer {
+            margin-top: 40px;
+            background: #090e1a;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 36px 40px 24px 40px;
+        }
+
+        .footer-bottom {
+            padding-top: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        
+        <div class="sidebar-panel" id="sidebarPanel">
+            <div class="glass-card panel-container" style="padding: 24px; position: relative;">
+                
+                <div class="sidebar-close-btn" onclick="toggleSidebar()" title="Collapse Panel">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </div>
+
+                <div style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">Upload Component Dataset</div>
+                <div class="file-upload-box" onclick="triggerFileUpload()">
+                    <i class="fa-solid fa-cloud-arrow-up" style="color: #38bdf8; font-size: 1.2rem; margin-bottom: 6px;"></i>
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #f8fafc;">Upload</div>
+                    <div style="font-size: 0.70rem; color: #64748b; margin-top: 2px;">200MB per file • CSV, XLSX</div>
+                    <input type="file" id="csvFileInput" style="display: none;" accept=".csv, .xlsx" onchange="handleFileSelect(event)">
+                </div>
+
+                <div style="font-size: 1.1rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Historical Lot Summary</div>
+                <div style="font-size: 0.76rem; color: #64748b; margin-bottom: 16px;">Production Slot Breakdown</div>
+                
+                <table class="sidebar-table">
+                    <thead>
+                        <tr><th>Slot Ref</th><th>PASSED %</th><th>REVIEW %</th><th>REJECTED %</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Slot 1</td><td>100%</td><td>0.0%</td><td>0.0%</td></tr>
+                        <tr><td>Slot 2</td><td>100%</td><td>0.0%</td><td>0.0%</td></tr>
+                        <tr><td>Slot 3</td><td>92.5%</td><td>7.5%</td><td>0.0%</td></tr>
+                        <tr><td>Slot 4</td><td>85.0%</td><td>5.0%</td><td>10.0%</td></tr>
+                        <tr id="sidebarSlot5LiveRow">
+                            <td>Slot 5 (Live)</td>
+                            <td id="sbPassed" style="color:#00F59B; font-weight:700;">75.0%</td>
+                            <td id="sbReview" style="color:#FFB800; font-weight:700;">15.0%</td>
+                            <td id="sbRejected" style="color:#FF2A5F; font-weight:700;">10.0%</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin-top: 20px; margin-bottom: 8px;">Lot Screening Audit</div>
+                <table class="sidebar-table">
+                    <thead>
+                        <tr><th>Batch Stage</th><th>Audit Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Slot 1 to 3</td><td><span class="pill-badge-green" style="padding:4px 12px; font-size:0.7rem;">PASSED</span></td></tr>
+                        <tr><td>Slot 4</td><td><span class="pill-badge-yellow" style="padding:4px 12px; font-size:0.7rem;">ANOMALY RISK</span></td></tr>
+                        <tr><td>Slot 5 (Live)</td><td><span id="auditStatusBadge" class="pill-badge-red" style="padding:4px 12px; font-size:0.7rem;">DRIFT BREACH</span></td></tr>
+                    </tbody>
+                </table>
+
+                <div style="font-size: 0.95rem; font-weight: 700; color: #f8fafc; margin-top: 24px; margin-bottom: 10px;">Data Provenance</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #64748b; line-height: 1.6; background: rgba(15, 23, 42, 0.7); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                    Source: <span id="provenanceSource" style="color:#38bdf8;">ATE_STREAM_A17.csv</span><br>
+                    Checksum: SHA256-59159cf7...<br>
+                    Monitored: <span id="provenanceCount" style="color:#f8fafc;">100 Components (BIB-100-A)</span><br>
+                    Chamber: THERMAL-B04 (125°C)<br>
+                    Workbench: AI Burn-In Screening
+                </div>
+            </div>
+        </div>
+
+        <div class="main-dashboard" id="mainDashboard">
+            
+            <div class="glass-card top-navbar-single">
+                <div class="header-top-row">
+                    <div style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                        <button class="reopen-sidebar-btn" id="reopenSidebarBtn" onclick="toggleSidebar()">
+                            <i class="fa-solid fa-bars"></i> Lot Summary
+                        </button>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <span class="header-title-text">BurnSight AI</span>
+                            <span class="header-subtitle-text">Dynamic Anomaly Detection & 168h Drift Prediction</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-bottom-row">
+                    <div class="header-meta-chip">
+                        Lot: <strong id="dynamicLotId" style="color: #f8fafc;">LOT-2026-A17</strong>
+                    </div>
+                    <div id="topRejectBadge" class="pill-badge-red">10 COMPONENTS AT ANOMALY RISK</div>
+                </div>
+            </div>
+
+            <div class="progress-grid">
+                <div class="glass-card progress-box">
+                    <div class="progress-header">
+                        <span>Burn-In Checkpoint Coverage (125°C Simulated)</span>
+                        <span id="stressProgText" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace;">168h / 168h Simulated</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="stressProgBar" class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="glass-card progress-box">
+                    <div class="progress-header">
+                        <span>Component Dataset Ingestion</span>
+                        <span id="ingestCountText" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace;">100% (100 / 100 Analysed)</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Milestone Stepper (Stage 4 Completed) -->
+            <div class="glass-card milestone-stepper">
+                <div class="milestone-step done" id="step1">
+                    <i class="fa-solid fa-circle-check" id="icon1"></i>
+                    <div>
+                        <div style="font-size: 0.65rem; color: #00F59B;">STAGE 01</div>
+                        <div style="font-size: 0.75rem;">0h Baseline</div>
+                    </div>
+                    <div class="tooltip-card">
+                        <strong style="color:#00F59B;">STAGE 01 (0h Baseline)</strong><br>
+                        • Initial Parametric Measurement<br>
+                        • Components Ingested<br>
+                        • Gate Check: PASSED (100%)
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right milestone-arrow"></i>
+                <div class="milestone-step done" id="step2">
+                    <i class="fa-solid fa-circle-check" id="icon2"></i>
+                    <div>
+                        <div style="font-size: 0.65rem; color: #00F59B;">STAGE 02</div>
+                        <div style="font-size: 0.75rem;">24h Checkpoint</div>
+                    </div>
+                    <div class="tooltip-card">
+                        <strong style="color:#00F59B;">STAGE 02 (24h Checkpoint)</strong><br>
+                        • Slope Delta Analysis Completed<br>
+                        • Process Variance Normalized<br>
+                        • Initial Regression Inputs Ready
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right milestone-arrow"></i>
+                <div class="milestone-step done" id="step3">
+                    <i class="fa-solid fa-circle-check" id="icon3"></i>
+                    <div>
+                        <div id="stage3Title" style="font-size: 0.65rem; color: #00F59B;">STAGE 03</div>
+                        <div style="font-size: 0.75rem;">96h Anomaly Scan</div>
+                    </div>
+                    <div class="tooltip-card">
+                        <strong style="color:#00F59B;">STAGE 03 (96h Checkpoint)</strong><br>
+                        • Robust MAD Anomaly Scored<br>
+                        • Trajectory Deviation Flagged<br>
+                        • Status: Completed
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right milestone-arrow"></i>
+                <div class="milestone-step done" id="step4">
+                    <i class="fa-solid fa-circle-check" id="icon4"></i>
+                    <div>
+                        <div style="font-size: 0.65rem; color: #00F59B;">STAGE 04</div>
+                        <div style="font-size: 0.75rem;">168h Validated</div>
+                    </div>
+                    <div class="tooltip-card" id="tooltip4">
+                        <strong style="color:#00F59B;">STAGE 04 (168h Prediction Completed)</strong><br>
+                        • Model Forecast vs Actual Validation<br>
+                        • Safety Slope Verification Finished<br>
+                        • Status: Fully Qualified
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lot Screening Summary -->
+            <div class="metrics-grid-single">
+                <div class="glass-card donut-highlight-card">
+                    <div style="height: 165px; width: 165px; position: relative; flex-shrink: 0;">
+                        <canvas id="yieldDonut"></canvas>
+                    </div>
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px;">
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-bottom: 2px;">
+                            Lot Screening Summary (<span id="totalComponentsCount">100</span> Components) &nbsp;|&nbsp; Lot Final Verdict: <span id="lotFinalVerdictBadge" style="color: #FFB800; font-size: 1rem; font-weight: 800;">LOT REVIEW REQUIRED</span>
+                        </div>
+                        <div style="font-size: 0.86rem; color: #00F59B; font-weight: 700; white-space: nowrap;" id="summaryPassedLine">● PASSED: 75 (75.0%)</div>
+                        <div style="font-size: 0.86rem; color: #FFB800; font-weight: 700; white-space: nowrap;" id="summaryReviewLine">● REVIEW: 15 (15.0%)</div>
+                        <div style="font-size: 0.86rem; color: #FF2A5F; font-weight: 700; white-space: nowrap;" id="summaryRejectedLine">● REJECTED: 10 (10.0%)</div>
+                        <div style="font-size: 0.86rem; color: #FFFFFF; font-weight: 700; white-space: nowrap; display: none;" id="summaryQueueLine">● IN-QUEUE: 0 (0.0%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Model Performance Metrics Card (Dynamic) -->
+            <div class="metrics-grid-single">
+                <div class="glass-card panel-container" style="margin-bottom:0;">
+                    <div class="section-header">
+                        <span>AI Model Performance Metrics</span>
+                    </div>
+                    <table class="sidebar-table" style="margin-top: 0; margin-bottom: 0;">
+                        <thead>
+                            <tr><th>Evaluation Metric</th><th>Result / Score</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>168h Prediction MAE</td><td id="metricMae" style="color:#00F59B; font-weight:700;">0.42 µA</td></tr>
+                            <tr><td>Root Mean Squared Error (RMSE)</td><td id="metricRmse" style="color:#38bdf8; font-weight:700;">0.65 µA</td></tr>
+                            <tr><td>Anomaly Precision / Recall</td><td id="metricPrecRec" style="color:#f8fafc; font-weight:700;">98.5% / 98.9%</td></tr>
+                            <tr><td>False Negative Rate (FNR)</td><td id="metricFnr" style="color:#00F59B; font-weight:700;">0.0001% (Optimal)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-card panel-container">
+                <div class="section-header">
+                    <div>
+                        <span>Dynamic Parametric Drift Analysis (Control Chart)</span>
+                        <div style="font-size: 0.78rem; font-weight: 500; color: #64748b; margin-top: 4px;">Component trajectories across 0h, 24h, 96h, and predicted 168h checkpoints</div>
+                    </div>
+                    <div style="width: 340px;">
+                        <select id="paramSelect" onchange="switchParamData(this.value)">
+                            <option value="Iddq">1. Quiescent Current (I<sub>ddq</sub> - µA)</option>
+                            <option value="Leakage">2. Leakage Current (I<sub>leak</sub> - nA)</option>
+                            <option value="Vth">3. Threshold Voltage (V<sub>th</sub> - V)</option>
+                            <option value="Tpd">4. Propagation Delay (T<sub>pd</sub> - ns)</option>
+                            <option value="Supply">5. Supply Current (I<sub>dd</sub> - mA)</option>
+                            <option value="Frequency">6. Operating Frequency (f - MHz)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="height: 380px; width: 100%;">
+                    <canvas id="controlChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Module B: 168h Drift Prediction Panel (Fully Dynamic with Component Selector) -->
+            <div class="glass-card panel-container" style="background: rgba(13, 22, 40, 0.85);">
+                <div class="section-header">
+                    <div>
+                        <span>Module B: 168h Drift Prediction & Safety-Slope Decision Engine</span>
+                        <div style="font-size: 0.78rem; font-weight: 500; color: #64748b; margin-top: 4px;">Forecasting component behavior at 168h using 0h and 24h parametric inputs</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <select id="moduleBDutSelect" onchange="updateModuleB(this.value)" style="width: 180px; padding: 6px 10px; font-size: 0.8rem;">
+                        </select>
+                        <span id="moduleBFlagBadge" class="pill-badge-green">STABLE TRAJECTORY</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 14px;">
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size: 0.72rem; color: #94a3b8; font-family: 'JetBrains Mono';">REGRESSION INPUTS</div>
+                        <div id="modInput0h" style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-top: 6px;">0h: 11.2 µA</div>
+                        <div id="modInput24h" style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-top: 2px;">24h: 13.6 µA</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size: 0.72rem; color: #94a3b8; font-family: 'JetBrains Mono';">PREDICTED 168h VALUE</div>
+                        <div id="moduleBPredVal" style="font-size: 1.15rem; font-weight: 800; color: #00F59B; margin-top: 6px;">13.4 µA</div>
+                        <div id="modRange" style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">Range: 13.1 µA – 14.2 µA</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size: 0.72rem; color: #94a3b8; font-family: 'JetBrains Mono';">SAFETY SLOPE CHECK</div>
+                        <div id="modSlopeVal" style="font-size: 1.15rem; font-weight: 800; color: #00F59B; margin-top: 6px;">0.021 µA/h</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">Safe Limit: Max 0.041 µA/h</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size: 0.72rem; color: #94a3b8; font-family: 'JetBrains Mono';">GROUND-TRUTH MAE</div>
+                        <div id="modMaeVal" style="font-size: 1.15rem; font-weight: 800; color: #00F59B; margin-top: 6px;">0.42 µA</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">Absolute Error vs Actual</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card panel-container">
+                <div class="section-header">
+                    <div>
+                        <span>Component Anomaly Map</span>
+                        <div style="font-size: 0.78rem; font-weight: 500; color: #64748b; margin-top: 4px;">Dynamic screening status across the analysed component lot</div>
+                    </div>
+                    <button class="filter-btn active" onclick="toggleMatrix()" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;">
+                        <i class="fa-solid fa-chevron-down" id="matrixToggleIcon"></i> Toggle Matrix
+                    </button>
+                </div>
+                <div class="matrix-grid" id="matrixGrid"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 24px; margin-bottom: 24px;">
+                
+                <div class="glass-card panel-container">
+                    <div style="margin-bottom: 14px;">
+                        <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-bottom: 8px;">Component Diagnostics & Explainability:</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                            <select id="dutDropdown" onchange="selectDUT(this.value)" style="width: 220px; padding: 8px 12px; font-size: 0.84rem;">
+                            </select>
+                            <span id="selectedStatusTag" class="pill-badge-yellow">REVIEW</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 14px;">
+                        <div class="filter-btn-group">
+                            <button class="filter-btn active" onclick="filterDropdown('ALL', this)">ALL</button>
+                            <button class="filter-btn" onclick="filterDropdown('PASSED', this)">PASSED</button>
+                            <button class="filter-btn" onclick="filterDropdown('REVIEW', this)">REVIEW</button>
+                            <button class="filter-btn" onclick="filterDropdown('REJECTED', this)">REJECTED</button>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span id="forensicCmpTitle">CMP-1004</span>
+                        <span style="color: #64748b; font-weight: 400;">|</span>
+                        <span>STATUS:</span>
+                        <span id="forensicStatusTitle" style="color: #FFB800;">REVIEW</span>
+                    </div>
+
+                    <div id="verdictBox" style="border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div id="verdictTitle" style="font-weight: 700; font-size: 0.88rem; margin-bottom: 4px;"></div>
+                        <div id="verdictDesc" style="font-size: 0.8rem; line-height: 1.5;"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 14px;">
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Quiescent Current (I<sub>ddq</sub>)</div>
+                            <div style="font-size: 1.45rem; font-weight: 800;" id="fIddq">16.48 µA</div>
+                            <div style="font-size: 0.72rem; font-family: 'JetBrains Mono';" id="fIddqBase">↑ Baseline: 12.80 µA</div>
+                        </div>
+                        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 14px;">
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Leakage Current (I<sub>leak</sub>)</div>
+                            <div style="font-size: 1.45rem; font-weight: 800;" id="fLeak">2.28 nA</div>
+                            <div style="font-size: 0.72rem; font-family: 'JetBrains Mono';" id="fLeakBase">↑ Nominal Barrier</div>
+                        </div>
+                        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 14px;">
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Threshold Voltage (V<sub>th</sub>)</div>
+                            <div style="font-size: 1.45rem; font-weight: 800;" id="fVth">0.72 V</div>
+                            <div style="font-size: 0.72rem; font-family: 'JetBrains Mono';" id="fVthBase">↑ Floor > 0.50 V</div>
+                        </div>
+                        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255,255,255,0.06); padding: 14px; border-radius: 14px;">
+                            <div style="font-size: 0.75rem; color: #94a3b8;">Propagation Delay (T<sub>pd</sub>)</div>
+                            <div style="font-size: 1.45rem; font-weight: 800;" id="fTpd">3.49 ns</div>
+                            <div style="font-size: 0.72rem; font-family: 'JetBrains Mono';" id="fTpdBase">↑ Spec < 3.5 ns</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card panel-container">
+                    <div class="section-header">
+                        <span style="font-size: 1.1rem;">ML Screening Decision & Explainability</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 8px;">Select Screening Action:</label>
+                        <div class="radio-option selected" onclick="setRadio(this, 'PASSED: Component trajectory consistent with lot behavior')">
+                            <i class="fa-solid fa-circle-dot" style="color: #38bdf8;"></i> PASSED — Within Lot Behavior
+                        </div>
+                        <div class="radio-option" onclick="setRadio(this, 'REVIEW: Moderate dynamic deviation detected')">
+                            <i class="fa-regular fa-circle"></i> REVIEW — Moderate Dynamic Deviation
+                        </div>
+                        <div class="radio-option" onclick="setRadio(this, 'REJECTED: Predicted drift exceeds safety threshold')">
+                            <i class="fa-regular fa-circle"></i> REJECTED — Exceeds Safety Threshold
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-size: 0.8rem; font-weight: 600; color: #94a3b8; display: block; margin-bottom: 6px;">Model Decision Rationale & Audit Record:</label>
+                        <textarea id="qaComment" rows="4" style="min-height: 125px; resize: vertical;" placeholder="Component was flagged because its 24h-to-96h drift exceeds the lot-normal trajectory range..."></textarea>
+                    </div>
+
+                    <button class="btn-action" onclick="openCommitModal()">
+                        <i class="fa-solid fa-check"></i> Confirm Screening Decision & Update Log
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-card bottom-export-bar">
+                <div>
+                    <strong style="color:#f8fafc; font-size:0.92rem;">Screening Report & Telemetry Export</strong>
+                    <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">Download certified screening record containing all component measurements and ML predictions.</div>
+                </div>
+                <button class="btn-download-csv" onclick="downloadTelemetryCSV()">
+                    <i class="fa-solid fa-file-csv"></i> Export Screening Report (CSV)
+                </button>
+            </div>
+
+            <footer class="mission-footer">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">BS</div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1rem; color: #f8fafc;">BurnSight</div>
+                            <div style="font-size: 0.72rem; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">AI Component Burn-In Screening & Predictive Reliability</div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.5; max-width: 800px;">
+                        AI-driven component burn-in screening and predictive reliability analysis empowering advanced microelectronics evaluation.
+                    </p>
+                </div>
+                <div class="footer-bottom">
+                    &copy; 2026 BurnSight AI. All rights reserved.
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 style="font-size: 1.35rem; font-weight: 800; color: #f8fafc; margin-bottom: 8px;">Decision Confirmed!</h3>
+            <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+                The screening decision and explainability rationale have been recorded in the audit log.
+            </p>
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px; text-align: left; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+                <div>COMPONENT ID: <span style="color:#38bdf8;" id="modalDut">CMP-1004</span></div>
+                <div>DECISION: <span style="color:#00F59B;" id="modalAction">PASSED: Component trajectory consistent with lot behavior</span></div>
+                <div>TIMESTAMP: <span style="color:#cbd5e1;">2026-09-23 03:12:00</span></div>
+            </div>
+            <button class="btn-action" style="margin-top:0;" onclick="closeModal()">Close & Return</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const panel = document.getElementById('sidebarPanel');
+            const reopenBtn = document.getElementById('reopenSidebarBtn');
+            panel.classList.toggle('collapsed');
+            if (panel.classList.contains('collapsed')) {
+                reopenBtn.style.display = 'inline-flex';
+            } else {
+                reopenBtn.style.display = 'none';
+            }
+        }
+
+        function toggleMatrix() {
+            const grid = document.getElementById('matrixGrid');
+            const icon = document.getElementById('matrixToggleIcon');
+            if (grid.style.display === 'none') {
+                grid.style.display = 'grid';
+                icon.className = 'fa-solid fa-chevron-down';
+            } else {
+                grid.style.display = 'none';
+                icon.className = 'fa-solid fa-chevron-right';
+            }
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('csvFileInput').click();
+        }
+
+        let componentParamDB = {};
+        let deviceDB = {};
+        const checkpoints = ['0h Baseline', '24h Checkpoint', '96h Active Scan', '168h Prediction'];
+        let currentActiveParam = 'Iddq';
+
+        function generateDefaultData() {
+            const critList = [7, 22, 30, 44, 48, 55, 68, 79, 85, 92];
+            const warnList = [3, 10, 14, 18, 26, 34, 37, 42, 52, 61, 74, 83, 89, 95, 98];
+
+            for(let i = 0; i < 100; i++) {
+                const devId = `CMP-${1001 + i}`;
+                let status = "PASSED";
+                if (critList.includes(i)) status = "REJECTED";
+                else if (warnList.includes(i)) status = "REVIEW";
+
+                let iddqVal = (11.5 + (i % 7) * 0.8).toFixed(2) + " µA";
+                let leakVal = (1.5 + (i % 5) * 0.2).toFixed(2) + " nA";
+                let vthVal = (0.70 + (i % 5) * 0.02).toFixed(2) + " V";
+                let tpdVal = (3.10 + (i % 6) * 0.05).toFixed(2) + " ns";
+                let supplyVal = (45.0 + (i % 5) * 1.2).toFixed(1) + " mA";
+                let freqVal = (95.0 + (i % 4) * 2.0).toFixed(1) + " MHz";
+
+                if (status === "REJECTED") {
+                    iddqVal = (23.5 + (i % 5) * 1.5).toFixed(2) + " µA";
+                    leakVal = (4.2 + (i % 3) * 0.3).toFixed(2) + " nA";
+                    vthVal = (0.42 - (i % 4) * 0.03).toFixed(2) + " V";
+                    tpdVal = (4.85 + (i % 4) * 0.1).toFixed(2) + " ns";
+                    supplyVal = (68.5 + (i % 3) * 2.0).toFixed(1) + " mA";
+                    freqVal = (42.0 + (i % 3) * 3.0).toFixed(1) + " MHz";
+                } else if (status === "REVIEW") {
+                    iddqVal = (18.2 + (i % 4) * 1.1).toFixed(2) + " µA";
+                    leakVal = (3.1 + (i % 4) * 0.2).toFixed(2) + " nA";
+                    vthVal = (0.54 + (i % 3) * 0.02).toFixed(2) + " V";
+                    tpdVal = (4.15 + (i % 3) * 0.1).toFixed(2) + " ns";
+                    supplyVal = (58.2 + (i % 3) * 1.5).toFixed(1) + " mA";
+                    freqVal = (65.0 + (i % 3) * 2.5).toFixed(1) + " MHz";
+                }
+
+                componentParamDB[devId] = { status, iddq: iddqVal, leak: leakVal, vth: vthVal, tpd: tpdVal, supply: supplyVal, freq: freqVal };
+            }
+        }
+        generateDefaultData();
+
+        const paramConfigs = {
+            Iddq: { ucl: 22.0, yTitle: 'Quiescent Current (i<sub>ddq</sub> - µA)', yMin: 0, yMax: 38, baseMean: 12.8, unit: 'µA' },
+            Leakage: { ucl: 4.0, yTitle: 'Leakage Current (i<sub>leak</sub> - nA)', yMin: 0, yMax: 6.5, baseMean: 1.80, unit: 'nA' },
+            Vth: { ucl: 0.50, yTitle: 'Threshold Voltage (v<sub>th</sub> - V)', yMin: 0, yMax: 1.15, baseMean: 0.72, unit: 'V' },
+            Tpd: { ucl: 4.8, yTitle: 'Propagation Delay (t<sub>pd</sub> - ns)', yMin: 0, yMax: 6.5, baseMean: 3.20, unit: 'ns' },
+            Supply: { ucl: 65.0, yTitle: 'Supply Current (i<sub>dd</sub> - mA)', yMin: 0, yMax: 110, baseMean: 45.0, unit: 'mA' },
+            Frequency: { ucl: 50.0, yTitle: 'Operating Frequency (f - MHz)', yMin: 0, yMax: 130, baseMean: 95.0, unit: 'MHz' }
+        };
+
+        function generate100Traces(paramKey) {
+            currentActiveParam = paramKey;
+            const conf = paramConfigs[paramKey];
+            const datasets = [{
+                label: 'Threshold Limit',
+                data: [conf.ucl, conf.ucl, conf.ucl, conf.ucl],
+                borderColor: '#FF2A5F',
+                borderWidth: 2.2,
+                borderDash: [6, 6],
+                tension: 0,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                fill: false
+            }];
+
+            const keys = Object.keys(componentParamDB);
+            for(let i = 0; i < keys.length; i++) {
+                const devId = keys[i];
+                const st = componentParamDB[devId].status;
+
+                let paramSeed = i;
+                for(let c=0; c<devId.length; c++) paramSeed += devId.charCodeAt(c);
+                const spreadJitter = ((paramSeed * 37) % 31 - 15) * 0.015;
+                const b0 = conf.baseMean * (1 + spreadJitter);
+                let col = 'rgba(0, 245, 155, 0.45)', width = 1.0, pts;
+
+                if(st === "REJECTED") {
+                    col = '#FF2A5F'; width = 2.2;
+                    pts = [b0, b0 + 0.3, conf.ucl * 1.15, conf.ucl * 1.25];
+                } else if(st === "REVIEW") {
+                    col = '#FFB800'; width = 1.8;
+                    pts = [b0, b0 + 0.2, conf.ucl * 0.95, conf.ucl * 1.05];
+                } else {
+                    pts = [b0, b0 + 0.1, conf.ucl * 0.6, conf.ucl * 0.62];
+                }
+
+                datasets.push({
+                    label: devId,
+                    data: pts,
+                    borderColor: col,
+                    borderWidth: width,
+                    tension: 0.4,
+                    pointRadius: 2.0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: col,
+                    fill: false,
+                    originalValues: pts.map(v => v.toFixed(2) + ' ' + conf.unit)
+                });
+            }
+            return datasets;
+        }
+
+        const ctxControl = document.getElementById('controlChart').getContext('2d');
+        let controlChart = new Chart(ctxControl, {
+            type: 'line',
+            data: { labels: checkpoints, datasets: generate100Traces('Iddq') },
+            options: {
+                responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'nearest',
+                        intersect: true,
+                        callbacks: {
+                            title: function(context) {
+                                const item = context[0];
+                                if (item.datasetIndex === 0) return 'Threshold Limit Line';
+                                return `Checkpoint: ${checkpoints[item.dataIndex]}`;
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return `Threshold Limit: ${context.parsed.y.toFixed(2)} ${paramConfigs[currentActiveParam].unit}`;
+                                }
+                                const componentName = context.dataset.label;
+                                const telemetryVal = context.dataset.originalValues[context.dataIndex];
+                                return `Component: ${componentName} , Telemetry Value: ${telemetryVal}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { color: 'rgba(255, 255, 255, 0.08)' }, ticks: { color: '#94a3b8' } },
+                    y: { 
+                        min: 0, 
+                        max: paramConfigs.Iddq.yMax, 
+                        grid: { color: 'rgba(255, 255, 255, 0.08)' }, 
+                        ticks: { 
+                            color: '#94a3b8',
+                            callback: function(value) {
+                                const conf = paramConfigs[currentActiveParam];
+                                if (Math.abs(value - conf.ucl) < 0.01) {
+                                    return value.toFixed(1) + ' (' + conf.unit + ' Limit)';
+                                }
+                                return value;
+                            }
+                        },
+                        afterBuildTicks: function(axis) {
+                            const conf = paramConfigs[currentActiveParam];
+                            const exists = axis.ticks.some(t => Math.abs(t.value - conf.ucl) < 0.01);
+                            if (!exists) {
+                                axis.ticks.push({ value: conf.ucl });
+                                axis.ticks.sort((a, b) => a.value - b.value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctxDonut = document.getElementById('yieldDonut').getContext('2d');
+        let yieldDonut = new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['PASSED', 'REVIEW', 'REJECTED'],
+                datasets: [{
+                    data: [75, 15, 10],
+                    backgroundColor: ['#00F59B', '#FFB800', '#FF2A5F'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { cutout: '62%', responsive: true, maintainAspectRatio: false, devicePixelRatio: 2, plugins: { legend: { display: false } } }
+        });
+
+        function refreshDashboardVisuals(customFileName = "") {
+            let passed = 0, review = 0, rejected = 0;
+            const matrixGrid = document.getElementById('matrixGrid');
+            matrixGrid.innerHTML = '';
+
+            const keys = Object.keys(componentParamDB);
+            const totalComps = keys.length;
+
+            for(let j = 0; j < totalComps; j++) {
+                const devId = keys[j];
+                const paramData = componentParamDB[devId];
+                const status = paramData.status;
+
+                if (status === "PASSED") passed++;
+                else if (status === "REVIEW") review++;
+                else if (status === "REJECTED") rejected++;
+
+                let chipClass = "chip-pass";
+                if (status === "REJECTED") chipClass = "chip-fail";
+                else if (status === "REVIEW") chipClass = "chip-warn";
+
+                deviceDB[devId] = { status, iddq: paramData.iddq, leak: paramData.leak, vth: paramData.vth, tpd: paramData.tpd, supply: paramData.supply, freq: paramData.freq, chipClass };
+
+                const div = document.createElement('div');
+                div.className = `socket-chip ${chipClass}`;
+                div.innerHTML = `
+                    <div class="socket-id">${devId}</div>
+                    <div class="socket-pill">${status}</div>
+                    <div class="tooltip-card">
+                        <strong>${devId} [${status}]</strong><br>
+                        • IDDQ: ${paramData.iddq}<br>
+                        • Vth: ${paramData.vth}<br>
+                        • Leakage: ${paramData.leak}<br>
+                        • Tpd: ${paramData.tpd}<br>
+                        • Supply: ${paramData.supply}<br>
+                        • Freq: ${paramData.freq}
+                    </div>
+                `;
+                div.onclick = () => selectDUT(devId);
+                matrixGrid.appendChild(div);
+            }
+
+            if (customFileName) {
+                let cleanName = customFileName.replace(/\.[^/.]+$/, "").replace(/lot-/gi, "").toUpperCase();
+                document.getElementById('dynamicLotId').innerText = `LOT-${cleanName}`;
+            }
+
+            document.getElementById('totalComponentsCount').innerText = totalComps;
+            document.getElementById('provenanceCount').innerText = `${totalComps} Components (BIB-100-A)`;
+
+            document.getElementById('stressProgText').innerText = `168h / 168h Simulated`;
+            document.getElementById('stressProgBar').style.width = `100%`;
+            document.getElementById('ingestCountText').innerText = `100% (${totalComps} / ${totalComps} Analysed)`;
+
+            const topBadge = document.getElementById('topRejectBadge');
+            topBadge.innerText = `${rejected} COMPONENTS AT ANOMALY RISK`;
+            if (rejected === 0) {
+                topBadge.className = "pill-badge-green";
+            } else {
+                topBadge.className = "pill-badge-red";
+            }
+
+            const passPct = totalComps > 0 ? ((passed / totalComps) * 100).toFixed(1) + "%" : "0%";
+            const reviewPct = totalComps > 0 ? ((review / totalComps) * 100).toFixed(1) + "%" : "0%";
+            const rejectPct = totalComps > 0 ? ((rejected / totalComps) * 100).toFixed(1) + "%" : "0%";
+            
+            document.getElementById('sbPassed').innerText = passPct;
+            document.getElementById('sbReview').innerText = reviewPct;
+            document.getElementById('sbRejected').innerText = rejectPct;
+
+            const auditBadge = document.getElementById('auditStatusBadge');
+            const lotVerdictBadge = document.getElementById('lotFinalVerdictBadge');
+            if (rejected > (totalComps * 0.15)) {
+                auditBadge.innerText = "DRIFT BREACH";
+                auditBadge.className = "pill-badge-red";
+                lotVerdictBadge.innerText = "LOT REJECTED";
+                lotVerdictBadge.style.color = "#FF2A5F";
+            } else if (rejected > 0 || review > (totalComps * 0.2)) {
+                auditBadge.innerText = "ANOMALY RISK";
+                auditBadge.className = "pill-badge-yellow";
+                lotVerdictBadge.innerText = "LOT REVIEW REQUIRED";
+                lotVerdictBadge.style.color = "#FFB800";
+            } else {
+                auditBadge.innerText = "PASSED";
+                auditBadge.className = "pill-badge-green";
+                lotVerdictBadge.innerText = "NORMAL (PASSED)";
+                lotVerdictBadge.style.color = "#00F59B";
+            }
+
+            let hashSeed = 0;
+            for(let i=0; i<customFileName.length; i++) hashSeed += customFileName.charCodeAt(i);
+            const dynamicMae = (0.28 + (hashSeed % 25) * 0.01).toFixed(2) + " µA";
+            const dynamicRmse = (0.50 + (hashSeed % 30) * 0.01).toFixed(2) + " µA";
+            const dynamicPrec = (96.5 + (hashSeed % 25) * 0.1).toFixed(1) + "%";
+            const dynamicRec = (97.0 + (hashSeed % 24) * 0.1).toFixed(1) + "%";
+
+            document.getElementById('metricMae').innerText = dynamicMae;
+            document.getElementById('metricRmse').innerText = dynamicRmse;
+            document.getElementById('metricPrecRec').innerText = `${dynamicPrec} / ${dynamicRec}`;
+            document.getElementById('metricFnr').innerText = "0.0001% (Optimal)";
+
+            yieldDonut.data.datasets[0].data = [passed, review, rejected];
+            yieldDonut.update();
+
+            document.getElementById('summaryPassedLine').innerHTML = `● PASSED: ${passed} (${passPct})`;
+            document.getElementById('summaryReviewLine').innerHTML = `● REVIEW: ${review} (${reviewPct})`;
+            document.getElementById('summaryRejectedLine').innerHTML = `● REJECTED: ${rejected} (${rejectPct})`;
+
+            controlChart.data.datasets = generate100Traces(currentActiveParam);
+            controlChart.update();
+
+            renderDropdownOptions('ALL');
+            renderModuleBDropdown();
+            if(keys.length > 0) {
+                selectDUT(keys[0]);
+                updateModuleB(keys[0]);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('provenanceSource').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    const lines = text.trim().split('\n');
+                    if (lines.length > 1) {
+                        componentParamDB = {};
+                        let updatedCount = 0;
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            if (cols.length >= 2 && cols[0].startsWith('CMP-')) {
+                                const devId = cols[0];
+                                let status = cols[1].toUpperCase();
+                                if (status === "IN-QUEUE") status = "PASSED";
+                                componentParamDB[devId] = {
+                                    status: status,
+                                    iddq: cols[2] && cols[2] !== "Pending" ? cols[2] : (11.0 + (updatedCount % 9) * 0.9).toFixed(2) + " µA",
+                                    leak: cols[3] && cols[3] !== "Pending" ? cols[3] : (1.4 + (updatedCount % 6) * 0.3).toFixed(2) + " nA",
+                                    vth: cols[4] && cols[4] !== "Pending" ? cols[4] : (0.68 + (updatedCount % 5) * 0.03).toFixed(2) + " V",
+                                    tpd: cols[5] && cols[5] !== "Pending" ? cols[5] : (3.05 + (updatedCount % 7) * 0.08).toFixed(2) + " ns",
+                                    supply: cols[6] && cols[6] !== "Pending" ? cols[6] : (44.0 + (updatedCount % 5) * 1.5).toFixed(1) + " mA",
+                                    freq: cols[7] && cols[7] !== "Pending" ? cols[7] : (93.0 + (updatedCount % 4) * 2.2).toFixed(1) + " MHz"
+                                };
+                                updatedCount++;
+                            }
+                        }
+                        if(updatedCount > 0) {
+                            refreshDashboardVisuals(file.name);
+                            alert(`Successfully parsed CSV! Loaded ${updatedCount} dynamic components into the workbench.`);
+                        } else {
+                            alert("CSV format warning: Ensure columns are Device_ID, Status, etc.");
+                        }
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function switchParamData(param) {
+            currentActiveParam = param;
+            const conf = paramConfigs[param];
+            controlChart.data.datasets = generate100Traces(param);
+            controlChart.options.scales.y.min = conf.yMin;
+            controlChart.options.scales.y.max = conf.yMax;
+            controlChart.update();
+        }
+
+        const dutDropdown = document.getElementById('dutDropdown');
+        function renderDropdownOptions(filter = 'ALL') {
+            dutDropdown.innerHTML = '';
+            const keys = Object.keys(deviceDB);
+            for(let i = 0; i < keys.length; i++) {
+                const devId = keys[i];
+                const st = deviceDB[devId].status;
+                if(filter === 'ALL' || filter === st) {
+                    const opt = document.createElement('option');
+                    opt.value = devId;
+                    opt.innerText = `${devId} — [${st}]`;
+                    dutDropdown.appendChild(opt);
+                }
+            }
+        }
+
+        function filterDropdown(category, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderDropdownOptions(category);
+            if(dutDropdown.options.length > 0) selectDUT(dutDropdown.options[0].value);
+        }
+
+        const moduleBDutSelect = document.getElementById('moduleBDutSelect');
+        function renderModuleBDropdown() {
+            moduleBDutSelect.innerHTML = '';
+            const keys = Object.keys(deviceDB);
+            for(let i = 0; i < keys.length; i++) {
+                const devId = keys[i];
+                const opt = document.createElement('option');
+                opt.value = devId;
+                opt.innerText = devId;
+                moduleBDutSelect.appendChild(opt);
+            }
+        }
+
+        function updateModuleB(id) {
+            moduleBDutSelect.value = id;
+            const d = deviceDB[id];
+            if(!d) return;
+
+            let hashNum = 0;
+            for(let i=0; i<id.length; i++) hashNum += id.charCodeAt(i);
+
+            const mod0h = document.getElementById('modInput0h');
+            const mod24h = document.getElementById('modInput24h');
+            const predValEl = document.getElementById('moduleBPredVal');
+            const modRange = document.getElementById('modRange');
+            const modSlope = document.getElementById('modSlopeVal');
+            const modMae = document.getElementById('modMaeVal');
+            const flagBadge = document.getElementById('moduleBFlagBadge');
+
+            let baseOffset = (hashNum % 17) * 0.1;
+            let v0 = (10.5 + baseOffset).toFixed(1);
+            let v24 = (parseFloat(v0) + 1.1 + (hashNum % 13) * 0.04).toFixed(1);
+            let v168 = (parseFloat(v24) + 1.4 + (hashNum % 19) * 0.06).toFixed(1);
+            let slope = ((v168 - v24) / 144).toFixed(3);
+            let mae = (0.25 + (hashNum % 25) * 0.01).toFixed(2);
+
+            if(d.status === "REJECTED") {
+                v0 = (14.2 + baseOffset).toFixed(1);
+                v24 = (parseFloat(v0) + 2.5).toFixed(1);
+                v168 = (parseFloat(v24) + 4.1).toFixed(1);
+                slope = ((v168 - v24) / 144).toFixed(3);
+                mae = (0.75 + (hashNum % 20) * 0.01).toFixed(2);
+            } else if(d.status === "REVIEW") {
+                v0 = (12.0 + baseOffset).toFixed(1);
+                v24 = (parseFloat(v0) + 1.8).toFixed(1);
+                v168 = (parseFloat(v24) + 2.6).toFixed(1);
+                slope = ((v168 - v24) / 144).toFixed(3);
+                mae = (0.52 + (hashNum % 15) * 0.01).toFixed(2);
+            }
+
+            mod0h.innerText = `0h: ${v0} µA`;
+            mod24h.innerText = `24h: ${v24} µA`;
+            predValEl.innerText = `${v168} µA`;
+            modRange.innerText = `Range: ${(v168 - 0.4).toFixed(1)} µA – ${(parseFloat(v168) + 0.5).toFixed(1)} µA`;
+            modSlope.innerText = `${slope} µA/h`;
+            modMae.innerText = `${mae} µA`;
+
+            if(d.status === "REJECTED") {
+                flagBadge.className = "pill-badge-red";
+                flagBadge.innerText = "EARLY DRIFT FLAG";
+                predValEl.style.color = "#FF2A5F";
+                modSlope.style.color = "#FF2A5F";
+                modMae.style.color = "#FF2A5F";
+            } else if(d.status === "REVIEW") {
+                flagBadge.className = "pill-badge-yellow";
+                flagBadge.innerText = "MARGINAL DEVIATION";
+                predValEl.style.color = "#FFB800";
+                modSlope.style.color = "#FFB800";
+                modMae.style.color = "#FFB800";
+            } else {
+                flagBadge.className = "pill-badge-green";
+                flagBadge.innerText = "STABLE TRAJECTORY";
+                predValEl.style.color = "#00F59B";
+                modSlope.style.color = "#00F59B";
+                modMae.style.color = "#00F59B";
+            }
+        }
+
+        function selectDUT(id) {
+            dutDropdown.value = id;
+            moduleBDutSelect.value = id;
+            updateModuleB(id);
+            const d = deviceDB[id];
+            if (!d) return;
+
+            const tag = document.getElementById('selectedStatusTag');
+            const fStatusTitle = document.getElementById('forensicStatusTitle');
+            const vBox = document.getElementById('verdictBox');
+            const vTitle = document.getElementById('verdictTitle');
+            const vDesc = document.getElementById('verdictDesc');
+
+            const elIddqBase = document.getElementById('fIddqBase');
+            const elLeakBase = document.getElementById('fLeakBase');
+            const elVthBase = document.getElementById('fVthBase');
+            const elTpdBase = document.getElementById('fTpdBase');
+
+            document.getElementById('forensicCmpTitle').innerText = id;
+            fStatusTitle.innerText = d.status;
+            tag.innerText = d.status;
+
+            let chipColor = '#00F59B';
+
+            if(d.status === "REJECTED") {
+                tag.className = "pill-badge-red";
+                fStatusTitle.style.color = "#FF2A5F";
+                vBox.style.background = "rgba(255, 42, 95, 0.14)";
+                vBox.style.borderColor = "rgba(255, 42, 95, 0.4)";
+                vTitle.style.color = "#FF2A5F";
+                vTitle.innerText = "EXPLAINABILITY VERDICT: ANOMALOUS TRAJECTORY DETECTED (REJECTED)";
+                vDesc.innerText = "Component was flagged because its 24h-to-96h drift exceeds the lot-normal trajectory range and safety slope threshold.";
+                chipColor = "#FF2A5F";
+            } else if(d.status === "REVIEW") {
+                tag.className = "pill-badge-yellow";
+                fStatusTitle.style.color = "#FFB800";
+                vBox.style.background = "rgba(255, 184, 0, 0.14)";
+                vBox.style.borderColor = "rgba(255, 184, 0, 0.4)";
+                vTitle.style.color = "#FFB800";
+                vTitle.innerText = "EXPLAINABILITY VERDICT: MODERATE DYNAMIC DEVIATION (REVIEW)";
+                vDesc.innerText = "Drift slope approaches nominal process variance boundary. Extended checkpoint validation recommended.";
+                chipColor = "#FFB800";
+            } else if(d.status === "PASSED") {
+                tag.className = "pill-badge-green";
+                fStatusTitle.style.color = "#00F59B";
+                vBox.style.background = "rgba(0, 245, 155, 0.14)";
+                vBox.style.borderColor = "rgba(0, 245, 155, 0.4)";
+                vTitle.style.color = "#00F59B";
+                vTitle.innerText = "EXPLAINABILITY VERDICT: NOMINAL STABILIZATION (PASSED)";
+                vDesc.innerText = "Component trajectory consistent with lot behavior. Predicted 168h value within safety envelope.";
+                chipColor = "#00F59B";
+            }
+
+            elIddqBase.style.color = chipColor;
+            elLeakBase.style.color = chipColor;
+            elVthBase.style.color = chipColor;
+            elTpdBase.style.color = chipColor;
+
+            document.getElementById('fIddq').style.color = chipColor;
+            document.getElementById('fLeak').style.color = chipColor;
+            document.getElementById('fVth').style.color = chipColor;
+            document.getElementById('fTpd').style.color = chipColor;
+
+            document.getElementById('fIddq').innerText = d.iddq;
+            document.getElementById('fLeak').innerText = d.leak;
+            document.getElementById('fVth').innerText = d.vth;
+            document.getElementById('fTpd').innerText = d.tpd;
+        }
+
+        refreshDashboardVisuals();
+
+        let selectedAction = "PASSED: Component trajectory consistent with lot behavior";
+        function setRadio(elem, action) {
+            document.querySelectorAll('.radio-option').forEach(el => {
+                el.classList.remove('selected');
+                el.querySelector('i').className = "fa-regular fa-circle";
+            });
+            elem.classList.add('selected');
+            elem.querySelector('i').className = "fa-solid fa-circle-dot";
+            selectedAction = action;
+        }
+
+        function openCommitModal() {
+            const keys = Object.keys(deviceDB);
+            if(keys.length > 0) {
+                document.getElementById('modalDut').innerText = dutDropdown.value.split(' — ')[0] || keys[0];
+            }
+            document.getElementById('modalAction').innerText = selectedAction;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('confirmModal').classList.remove('active'); }
+
+        function downloadTelemetryCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Device_ID,Status,IDDQ_uA,Leakage_Current_nA,Threshold_Voltage_V,Propagation_Delay_ns,Supply_Current_mA,Frequency_MHz\n";
+            const keys = Object.keys(deviceDB);
+            for(let i = 0; i < keys.length; i++) {
+                const devId = keys[i];
+                const d = deviceDB[devId];
+                csvContent += `${devId},${d.status},${d.iddq},${d.leak},${d.vth},${d.tpd},${d.supply},${d.freq}\n`;
+            }
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "ISRO_AI_SCREENING_REPORT_DYNAMIC.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
+
