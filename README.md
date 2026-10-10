@@ -81,7 +81,8 @@ The system combines the available anomaly evidence and predicted drift to suppor
 
 These outcomes depend on the implemented screening rules and thresholds. The prototype is intended to support quality assessment, not replace formal qualification or engineering review.
 
-<img width="1000" height="500" alt="Screenshot (1067)" src="https://github.com/user-attachments/assets/16425153-c697-4ef7-ac40-4038729e4d1f" />  <img width="1000" height="500" alt="Screenshot (1064)" src="https://github.com/user-attachments/assets/ee4cf653-6778-473d-a314-cb2bf5baa672" />
+<img width="1000" height="500" alt="Screenshot (1067)" src="https://github.com/user-attachments/assets/16425153-c697-4ef7-ac40-4038729e4d1f" />
+<img width="1000" height="500" alt="Screenshot (1064)" src="https://github.com/user-attachments/assets/ee4cf653-6778-473d-a314-cb2bf5baa672" />
 
 
 
